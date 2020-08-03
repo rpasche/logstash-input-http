@@ -48,6 +48,10 @@ class LogStash::Inputs::Http < LogStash::Inputs::Base
   # Password for basic authorization
   config :password, :validate => :password, :required => false
 
+  # path to htpasswd file. If this is set, it will overwrite
+  # the user and password settings
+  config :htpasswd, :validate => :path
+
   # Events are by default sent in plain text. You can
   # enable encryption by setting `ssl` to true and configuring
   # the `ssl_certificate` and `ssl_key` options.
@@ -142,7 +146,7 @@ class LogStash::Inputs::Http < LogStash::Inputs::Base
     end
 
     require "logstash/inputs/http/message_handler"
-    message_handler = MessageHandler.new(self, @codec, @codecs, @auth_token)
+    message_handler = MessageHandler.new(self, @codec, @codecs, @auth_token, @htpasswd)
     @http_server = create_http_server(message_handler)
   end # def register
 

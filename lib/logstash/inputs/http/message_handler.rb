@@ -1,5 +1,7 @@
 # encoding: utf-8
 require "logstash-input-http_jars"
+require "base64"
+require "htauth"
 
 module LogStash module Inputs class Http
   class MessageHandler
@@ -7,18 +9,28 @@ module LogStash module Inputs class Http
 
     attr_reader :input
 
-    def initialize(input, default_codec, additional_codecs, auth_token)
+    def initialize(input, default_codec, additional_codecs, auth_token, htpasswd)
       @input = input
       @default_codec = default_codec
       @additional_codecs = additional_codecs
       @auth_token = auth_token
+      @htpasswd = htpasswd
     end
 
     def validates_token(token)
-      if @auth_token
+      if @htpasswd
+        authenticate_user(token)
+      elsif @auth_token
         @auth_token == token
       else
         true
+      end
+    end
+
+    def authenticate_user(token)
+      user, pw = Base64.decode64(token.sub('Basic ', '')).split(':')
+      HTAuth::PasswdFile.open(@htpasswd) do |pf|
+        pf.authenticate?(user, pw)
       end
     end
 
