@@ -28,9 +28,19 @@ module LogStash module Inputs class Http
     end
 
     def authenticate_user(token)
-      user, pw = Base64.decode64(token.sub('Basic ', '')).split(':')
-      HTAuth::PasswdFile.open(@htpasswd) do |pf|
-        pf.authenticate?(user, pw)
+      if token.nil?
+        false
+      else
+        authed = false
+        begin
+          user, pw = Base64.decode64(token.sub('Basic ', '')).split(':')
+          HTAuth::PasswdFile.open(@htpasswd) do |pf|
+            authed = pf.authenticated?(user, pw)
+          end
+        rescue
+            authed = false
+        end
+        return authed
       end
     end
 
@@ -39,7 +49,7 @@ module LogStash module Inputs class Http
     end
 
     def copy
-      MessageHandler.new(@input, @default_codec.clone, clone_additional_codecs(), @auth_token)
+      MessageHandler.new(@input, @default_codec.clone, clone_additional_codecs(), @auth_token, @htpasswd)
     end
 
     def clone_additional_codecs
