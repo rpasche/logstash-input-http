@@ -1,4 +1,4 @@
-# Logstash REST Filter [![Build Status](https://travis-ci.org/logstash-plugins/logstash-filter-http.svg?branch=master)](https://travis-ci.org/logstash-plugins/logstash-filter-http)
+# Logstash REST Filter [![Build Status](https://travis-ci.com/logstash-plugins/logstash-filter-http.svg?branch=master)](https://travis-ci.com/logstash-plugins/logstash-filter-http)
 
 This is a filter plugin for [Logstash](https://github.com/elastic/logstash).
 
